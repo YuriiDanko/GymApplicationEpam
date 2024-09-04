@@ -11,6 +11,14 @@ public abstract class User {
     private String username;
     private boolean isActive;
 
+    /*
+    * TODO: - Username going to be calculated from Trainer/Trainee first name and last name
+    *       by concatenation by using dot as a separator (eg. John.Smith)
+    *       - In the case that already exists Trainer or Trainee with the same pair of first and
+    *       last name as a suffix to the username should be added a serial number.
+    *       - Password should be generated as a random 10 chars length string.
+    * */
+
     public User(String firstName, String lastName, String password, String username, boolean isActive) {
         this.userId = UUID.randomUUID().toString();
         this.firstName = firstName;
@@ -21,11 +29,14 @@ public abstract class User {
     }
 
     public User(){
-
     }
 
     public String getUserId() {
         return userId;
+    }
+
+    public void setUserId(String userId){
+        this.userId = userId;
     }
 
     public String getFirstName() {
