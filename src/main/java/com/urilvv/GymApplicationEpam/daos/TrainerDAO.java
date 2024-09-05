@@ -24,7 +24,9 @@ public class TrainerDAO {
                 isActive,
                 spec);
 
-        return trainerStorage.put(trainer.getUserId(), trainer);
+        trainerStorage.put(trainer.getUserId(), trainer);
+
+        return trainer;
     }
 
     public Trainer editTrainer(String userId, String firstName, String lastName, String password,
@@ -36,7 +38,9 @@ public class TrainerDAO {
                 isActive,
                 spec);
 
-        return trainerStorage.put(userId, edited);
+        trainerStorage.put(userId, edited);
+
+        return edited;
     }
 
     public Trainer selectTrainer(String userId){

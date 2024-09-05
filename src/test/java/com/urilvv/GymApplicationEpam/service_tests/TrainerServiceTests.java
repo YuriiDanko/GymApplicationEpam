@@ -1,0 +1,77 @@
+package com.urilvv.GymApplicationEpam.service_tests;
+
+import com.urilvv.GymApplicationEpam.daos.TrainerDAO;
+import com.urilvv.GymApplicationEpam.enums.Specialization;
+import com.urilvv.GymApplicationEpam.models.Trainer;
+import com.urilvv.GymApplicationEpam.services.TrainerService;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.mockito.Mockito.*;
+
+@ExtendWith(MockitoExtension.class)
+public class TrainerServiceTests {
+
+    @Mock
+    private Map<String, Trainer> trainerStorage;
+
+    @InjectMocks
+    private TrainerDAO trainerDAO;
+
+    @InjectMocks
+    private TrainerService trainerService;
+
+    @BeforeEach
+    public void init() {
+        trainerDAO = new TrainerDAO(trainerStorage);
+        trainerService = new TrainerService(trainerDAO);
+    }
+
+    @Test
+    public void createTrainerTest() {
+        when(trainerStorage.put(any(String.class), any(Trainer.class))).thenReturn(null);
+
+        Trainer trainer = trainerService.createTrainer("Yurii", "Danko", "password",
+                "urilvv", true, "cardio");
+
+        assertEquals(trainer.getTrainerSpec(), Specialization.CARDIO);
+        verify(trainerStorage, times(1)).put(eq(trainer.getUserId()), any(Trainer.class));
+    }
+
+    @Test
+    public void editTrainerTest() {
+        when(trainerStorage.put(any(String.class), any(Trainer.class))).thenReturn(null);
+
+        Trainer trainer = trainerService.createTrainer("Yurii", "Danko", "password", "urilvv",
+                true, "cardio");
+
+        Trainer edited = trainerService.editTrainer(trainer.getUserId(), "Marko", "Yanovych", "password",
+                "smurfstuff", true, "strength");
+
+        assertNotEquals(trainer.getUsername(), edited.getUsername());
+        assertEquals(edited.getUsername(), "smurfstuff");
+        verify(trainerStorage, times(2)).put(any(String.class), any(Trainer.class));
+    }
+
+    @Test
+    public void selectTrainerTest() {
+        Trainer trainer = trainerService.createTrainer("Yurii", "Danko", "password", "urilvv",
+                true, "cardio");
+
+        when(trainerStorage.get(eq(trainer.getUserId()))).thenReturn(trainer);
+
+        Trainer selected = trainerService.selectTrainer(trainer.getUserId());
+
+        assertEquals(trainer, selected);
+        verify(trainerStorage, times(1)).get(eq(trainer.getUserId()));
+    }
+
+}
