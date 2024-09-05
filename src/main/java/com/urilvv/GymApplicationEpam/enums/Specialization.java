@@ -4,13 +4,13 @@ public enum Specialization {
 
     CARDIO("cardio_spec"), STRENGTH("strength_spec"), BODYBUILDING("bodybuilding_spec");
 
-    private String name;
+    private final String name;
 
     Specialization(String name) {
         this.name = name;
     }
 
     public String getName() {
-        return name;
+        return this.name;
     }
 }
