@@ -8,7 +8,7 @@ public class Trainer extends User{
 
     public Trainer(String firstName, String lastName, String password, String username, boolean isActive, String spec) {
         super(firstName, lastName, password, username, isActive);
-        this.trainerSpec = Specialization.valueOf(spec);
+        this.trainerSpec = Specialization.getSpec(spec + "_spec");
     }
 
     public Trainer(){
@@ -25,8 +25,7 @@ public class Trainer extends User{
 
     @Override
     public String toString() {
-        return "Trainer {" + super.toString() +
-                "trainerSpec=" + trainerSpec +
-                '}';
+        return String.format("Trainer - %s; Training Specialization - %s", super.getFirstName() + super.getLastName(),
+                this.trainerSpec.getName());
     }
 }
