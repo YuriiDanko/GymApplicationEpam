@@ -1,78 +1,40 @@
 package com.urilvv.GymApplicationEpam.models;
 
 import java.time.LocalDate;
+import java.time.Period;
 
-public class Trainee extends User{
+public class Trainee extends User {
 
     private LocalDate dateOfBirth;
     private String address;
 
-    public Trainee(String firstName, String lastName, String password, String username,
+    public Trainee(String firstName, String lastName, String username,
                    boolean isActive, LocalDate dateOfBirth, String address) {
-        super(firstName, lastName, password, username, isActive);
+        super(firstName, lastName, username, isActive);
         this.dateOfBirth = dateOfBirth;
+        this.address = address;
+    }
+
+    public LocalDate getDateOfBirth() {
+        return dateOfBirth;
+    }
+
+    public void setDateOfBirth(LocalDate dateOfBirth) {
+        this.dateOfBirth = dateOfBirth;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
         this.address = address;
     }
 
     @Override
     public String toString() {
-        return super.toString();
-    }
-
-    public static class TraineeBuilder{
-
-        private String firstName;
-        private String lastName;
-        private String password;
-        private String username;
-        private boolean isActive;
-        private LocalDate dateOfBirth;
-        private String address;
-
-        public static TraineeBuilder builder(){
-            return new TraineeBuilder();
-        }
-
-        public Trainee build(){
-            return new Trainee(firstName, lastName, password,
-                    username, isActive, dateOfBirth, address);
-        }
-
-        public TraineeBuilder firstName(String firstName){
-            this.firstName = firstName;
-            return this;
-        }
-
-        public TraineeBuilder lastName(String lastName){
-            this.lastName = lastName;
-            return this;
-        }
-
-        public TraineeBuilder password(String password){
-            this.password = password;
-            return this;
-        }
-
-        public TraineeBuilder username(String username){
-            this.username = username;
-            return this;
-        }
-
-        public TraineeBuilder isActive(boolean isActive){
-            this.isActive = isActive;
-            return this;
-        }
-
-        public TraineeBuilder dateOfBirth(LocalDate dateOfBirth){
-            this.dateOfBirth = dateOfBirth;
-            return this;
-        }
-
-        public TraineeBuilder address(String address){
-            this.address = address;
-            return this;
-        }
-
+        return String.format("Trainee - %s; Age - %sy.o.", super.getUsername(),
+                Period.between(this.dateOfBirth, LocalDate.now()).getYears());
     }
 
 }

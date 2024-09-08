@@ -2,16 +2,16 @@ package com.urilvv.GymApplicationEpam.models;
 
 import com.urilvv.GymApplicationEpam.enums.Specialization;
 
-public class Trainer extends User{
+public class Trainer extends User {
 
     private Specialization trainerSpec;
 
-    public Trainer(String firstName, String lastName, String password, String username, boolean isActive, String spec) {
-        super(firstName, lastName, password, username, isActive);
+    public Trainer(String firstName, String lastName, String username, boolean isActive, String spec) {
+        super(firstName, lastName, username, isActive);
         this.trainerSpec = Specialization.getSpec(spec + "_spec");
     }
 
-    public Trainer(){
+    public Trainer() {
         super();
     }
 

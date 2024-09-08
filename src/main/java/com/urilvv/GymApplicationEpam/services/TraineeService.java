@@ -10,23 +10,23 @@ import java.time.LocalDate;
 @Service
 public class TraineeService {
 
-    private TraineeDAO traineeDAO;
+    private final TraineeDAO traineeDAO;
 
     @Autowired
     public TraineeService(TraineeDAO traineeDAO) {
         this.traineeDAO = traineeDAO;
     }
 
-    public Trainee createTrainee(String firstName, String lastName, String password, String username,
+    public Trainee createTrainee(String firstName, String lastName, String username,
                                  boolean isActive, LocalDate dateOfBirth, String address) {
-        return traineeDAO.createTrainee(firstName, lastName, password, username,
+        return traineeDAO.createTrainee(firstName, lastName, username,
                 isActive, dateOfBirth, address);
     }
 
-    public Trainee editTrainee(String userId, String firstName, String lastName, String password, String username,
+    public Trainee editTrainee(String userId, String firstName, String lastName, String username,
                                boolean isActive, LocalDate dateOfBirth, String address) {
-        return traineeDAO.editTrainee(userId, firstName, lastName, password,
-                username, isActive, dateOfBirth, address);
+        return traineeDAO.editTrainee(userId, firstName, lastName, username,
+                isActive, dateOfBirth, address);
     }
 
     public boolean deleteTrainee(String userId) {
