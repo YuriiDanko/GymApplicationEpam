@@ -6,9 +6,10 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Component
-public class TraineeDAO {
+public class TraineeDAO implements Validation {
 
     private Map<String, Trainee> traineeStorage;
 
@@ -16,17 +17,14 @@ public class TraineeDAO {
         this.traineeStorage = traineeStorage;
     }
 
-    public Trainee createTrainee(String firstName, String lastName, String password, String username,
+    public Trainee createTrainee(String firstName, String lastName, String username,
                                  boolean isActive, LocalDate dateOfBirth, String address) {
-        Trainee trainee = Trainee.TraineeBuilder.builder()
-                .firstName(firstName)
-                .lastName(lastName)
-                .password(password)
-                .username(username)
-                .isActive(isActive)
-                .dateOfBirth(dateOfBirth)
-                .address(address)
-                .build();
+        if (validate(username)) {
+            username += "#" + ThreadLocalRandom.current().nextInt(1, 999);
+        }
+
+        Trainee trainee = new Trainee(firstName, lastName, username,
+                isActive, dateOfBirth, address);
 
         traineeStorage.put(trainee.getUserId(), trainee);
 
@@ -43,18 +41,11 @@ public class TraineeDAO {
         return true;
     }
 
-    public Trainee editTrainee(String userId, String firstName, String lastName, String password, String username,
+    public Trainee editTrainee(String userId, String firstName, String lastName, String username,
                                boolean isActive, LocalDate dateOfBirth, String address) {
 
-        Trainee edited = Trainee.TraineeBuilder.builder()
-                .firstName(firstName)
-                .lastName(lastName)
-                .password(password)
-                .username(username)
-                .isActive(isActive)
-                .dateOfBirth(dateOfBirth)
-                .address(address)
-                .build();
+        Trainee edited = new Trainee(firstName, lastName, username,
+                isActive, dateOfBirth, address);
 
         traineeStorage.put(userId, edited);
 
@@ -65,4 +56,14 @@ public class TraineeDAO {
         return traineeStorage.get(userId);
     }
 
+    @Override
+    public boolean validate(String username) {
+        for (Trainee entry : traineeStorage.values()) {
+            if (entry.getUsername().equals(username)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }
