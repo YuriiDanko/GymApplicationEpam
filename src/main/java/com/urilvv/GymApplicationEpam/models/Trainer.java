@@ -11,10 +11,6 @@ public class Trainer extends User {
         this.trainerSpec = Specialization.getSpec(spec + "_spec");
     }
 
-    public Trainer() {
-        super();
-    }
-
     public Specialization getTrainerSpec() {
         return trainerSpec;
     }
@@ -25,7 +21,7 @@ public class Trainer extends User {
 
     @Override
     public String toString() {
-        return String.format("Trainer - %s; Training Specialization - %s", super.getFirstName() + super.getLastName(),
+        return String.format("Trainer - %s; Training Specialization - %s", super.getUsername(),
                 this.trainerSpec.getName());
     }
 }
