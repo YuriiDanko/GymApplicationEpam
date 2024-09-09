@@ -2,7 +2,6 @@ package com.urilvv.GymApplicationEpam.service_tests;
 
 import com.urilvv.GymApplicationEpam.daos.TrainerDAO;
 import com.urilvv.GymApplicationEpam.enums.Specialization;
-import com.urilvv.GymApplicationEpam.models.Trainee;
 import com.urilvv.GymApplicationEpam.models.Trainer;
 import com.urilvv.GymApplicationEpam.services.TrainerService;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,7 +11,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 

@@ -8,8 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
@@ -34,7 +32,6 @@ public class TraineeServiceTests {
 
     @BeforeEach
     public void init() {
-        MockitoAnnotations.openMocks(this);
         traineeDAO = new TraineeDAO(traineeStorage);
         traineeService = new TraineeService(traineeDAO);
     }
