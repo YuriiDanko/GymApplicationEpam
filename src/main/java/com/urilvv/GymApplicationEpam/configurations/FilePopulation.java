@@ -3,6 +3,8 @@ package com.urilvv.GymApplicationEpam.configurations;
 import com.urilvv.GymApplicationEpam.models.Trainee;
 import com.urilvv.GymApplicationEpam.models.Trainer;
 import jakarta.annotation.PostConstruct;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -22,6 +24,7 @@ public class FilePopulation {
     @Value("${trainer.population}")
     private String trainerFilePath;
 
+    private final Logger logger = LoggerFactory.getLogger(FilePopulation.class);
     private final Map<String, Trainee> traineeStorage;
     private final Map<String, Trainer> trainerStorage;
 
@@ -33,8 +36,10 @@ public class FilePopulation {
 
     @PostConstruct
     private void populate() {
+        logger.info("Populating storages with data...");
         populateTrainee();
         populateTrainer();
+        logger.info("Storages are now filled with data.");
     }
 
     private void populateTrainee() {
@@ -47,7 +52,7 @@ public class FilePopulation {
                 traineeStorage.put(trainee.getUserId(), trainee);
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            logger.error(e.toString(), e);
         }
     }
 
@@ -60,7 +65,7 @@ public class FilePopulation {
                 trainerStorage.put(trainer.getUserId(), trainer);
             }
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            logger.error(e.toString(), e);
         }
     }
 
