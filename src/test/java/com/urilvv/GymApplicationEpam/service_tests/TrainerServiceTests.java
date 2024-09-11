@@ -40,7 +40,7 @@ public class TrainerServiceTests {
     public void createTrainerTest() {
         when(trainerStorage.put(any(String.class), any(Trainer.class))).thenReturn(null);
 
-        Trainer trainer = trainerService.createTrainer("Yurii", "Danko", "Yurii.Danko",
+        Trainer trainer = trainerService.createTrainer("Yurii", "Danko",
                 true, "cardio");
 
         assertEquals(trainer.getTrainerSpec(), Specialization.CARDIO);
@@ -51,10 +51,10 @@ public class TrainerServiceTests {
     public void editTrainerTest() {
         when(trainerStorage.put(any(String.class), any(Trainer.class))).thenReturn(null);
 
-        Trainer trainer = trainerService.createTrainer("Yurii", "Danko", "Yurii.Danko",
+        Trainer trainer = trainerService.createTrainer("Yurii", "Danko",
                 true, "cardio");
 
-        Trainer edited = trainerService.editTrainer(trainer.getUserId(), "Marko", "Yanovych", "Marko.Yanovych", true, "strength");
+        Trainer edited = trainerService.editTrainer(trainer.getUserId(), "Marko", "Yanovych", true, "strength");
 
         assertNotEquals(trainer.getUsername(), edited.getUsername());
         assertEquals(edited.getUsername(), "Marko.Yanovych");
@@ -63,7 +63,7 @@ public class TrainerServiceTests {
 
     @Test
     public void selectTrainerTest() {
-        Trainer trainer = trainerService.createTrainer("Yurii", "Danko", "Yurii.Danko",
+        Trainer trainer = trainerService.createTrainer("Yurii", "Danko",
                 true, "cardio");
 
         when(trainerStorage.get(eq(trainer.getUserId()))).thenReturn(trainer);
@@ -76,12 +76,12 @@ public class TrainerServiceTests {
 
     @Test
     public void similarNamesTest() {
-        Trainer trainer1 = trainerService.createTrainer("Yurii", "Danko", "Yurii.Danko",
+        Trainer trainer1 = trainerService.createTrainer("Yurii", "Danko",
                 true, "cardio");
 
         when(trainerStorage.values()).thenReturn(List.of(trainer1));
 
-        Trainer trainer2 = trainerService.createTrainer("Yurii", "Danko", "Yurii.Danko",
+        Trainer trainer2 = trainerService.createTrainer("Yurii", "Danko",
                 true, "cardio");
 
         assertNotEquals(trainer1.getUsername(), trainer2.getUsername());

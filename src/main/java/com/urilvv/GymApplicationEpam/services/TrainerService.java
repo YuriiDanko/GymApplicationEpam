@@ -15,9 +15,9 @@ public class TrainerService {
         this.trainerDAO = trainerDAO;
     }
 
-    public Trainer createTrainer(String firstName, String lastName, String username,
+    public Trainer createTrainer(String firstName, String lastName,
                                  boolean isActive, String spec) {
-        return trainerDAO.createTrainer(firstName, lastName, username,
+        return trainerDAO.createTrainer(firstName, lastName, firstName + "." + lastName,
                 isActive, spec);
     }
 
@@ -26,9 +26,9 @@ public class TrainerService {
     }
 
     public Trainer editTrainer(String userId, String firstName, String lastName,
-                               String username, boolean isActive, String spec) {
+                               boolean isActive, String spec) {
         return trainerDAO.editTrainer(userId, firstName, lastName,
-                username, isActive, spec);
+                firstName + "." + lastName, isActive, spec);
     }
 
 }

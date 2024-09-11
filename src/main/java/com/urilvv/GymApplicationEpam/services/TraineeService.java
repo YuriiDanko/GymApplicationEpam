@@ -17,15 +17,15 @@ public class TraineeService {
         this.traineeDAO = traineeDAO;
     }
 
-    public Trainee createTrainee(String firstName, String lastName, String username,
+    public Trainee createTrainee(String firstName, String lastName,
                                  boolean isActive, LocalDate dateOfBirth, String address) {
-        return traineeDAO.createTrainee(firstName, lastName, username,
+        return traineeDAO.createTrainee(firstName, lastName, firstName + "." + lastName,
                 isActive, dateOfBirth, address);
     }
 
-    public Trainee editTrainee(String userId, String firstName, String lastName, String username,
+    public Trainee editTrainee(String userId, String firstName, String lastName,
                                boolean isActive, LocalDate dateOfBirth, String address) {
-        return traineeDAO.editTrainee(userId, firstName, lastName, username,
+        return traineeDAO.editTrainee(userId, firstName, lastName, firstName + "." + lastName,
                 isActive, dateOfBirth, address);
     }
 

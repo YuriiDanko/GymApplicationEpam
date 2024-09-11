@@ -40,7 +40,7 @@ public class TraineeServiceTests {
     public void createTraineeTest() {
         when(traineeStorage.put(any(String.class), any(Trainee.class))).thenReturn(null);
 
-        Trainee trainee = traineeService.createTrainee("Yurii", "Danko", "Yurii.Danko",
+        Trainee trainee = traineeService.createTrainee("Yurii", "Danko",
                 true, LocalDate.of(2003, 8, 7), "Lviv, Avraama Linkolna");
 
         assertEquals(trainee.getUsername(), "Yurii.Danko");
@@ -51,10 +51,10 @@ public class TraineeServiceTests {
     public void editTraineeTest() {
         when(traineeStorage.put(any(String.class), any(Trainee.class))).thenReturn(null);
 
-        Trainee trainee = traineeService.createTrainee("Yurii", "Danko", "Yurii.Danko",
+        Trainee trainee = traineeService.createTrainee("Yurii", "Danko",
                 true, LocalDate.of(2003, 8, 7), "Lviv, Avraama Linkolna");
 
-        Trainee edited = traineeService.editTrainee(trainee.getUserId(), "Marko", "Danko", "Marko.Danko",
+        Trainee edited = traineeService.editTrainee(trainee.getUserId(), "Marko", "Danko",
                 true, LocalDate.of(2003, 8, 7), "Lviv, Shevchenka");
 
         assertNotEquals(trainee.getAddress(), edited.getAddress());
@@ -64,7 +64,7 @@ public class TraineeServiceTests {
 
     @Test
     public void selectTraineeTest() {
-        Trainee trainee = traineeService.createTrainee("Yurii", "Danko", "Yurii.Danko",
+        Trainee trainee = traineeService.createTrainee("Yurii", "Danko",
                 true, LocalDate.of(2003, 8, 7), "Lviv, Avraama Linkolna");
 
         when(traineeStorage.get(eq(trainee.getUserId()))).thenReturn(trainee);
@@ -77,7 +77,7 @@ public class TraineeServiceTests {
 
     @Test
     public void deleteTraineeTest() {
-        Trainee trainee = traineeService.createTrainee("Yurii", "Danko", "Yurii.Danko",
+        Trainee trainee = traineeService.createTrainee("Yurii", "Danko",
                 true, LocalDate.of(2003, 8, 7), "Lviv, Avraama Linkolna");
 
         when(traineeStorage.remove(eq(trainee.getUserId()))).thenReturn(trainee);
@@ -89,12 +89,12 @@ public class TraineeServiceTests {
 
     @Test
     public void similarNamesTest() {
-        Trainee trainee1 = traineeService.createTrainee("Yurii", "Danko", "Yurii.Danko",
+        Trainee trainee1 = traineeService.createTrainee("Yurii", "Danko",
                 true, LocalDate.of(2003, 8, 7), "Lviv, Avraama Linkolna");
 
         when(traineeStorage.values()).thenReturn(List.of(trainee1));
 
-        Trainee trainee2 = traineeService.createTrainee("Yurii", "Danko", "Yurii.Danko",
+        Trainee trainee2 = traineeService.createTrainee("Yurii", "Danko",
                 true, LocalDate.of(2003, 8, 7), "Lviv, Avraama Linkolna");
 
         assertNotEquals(trainee1.getUsername(), trainee2.getUsername());
