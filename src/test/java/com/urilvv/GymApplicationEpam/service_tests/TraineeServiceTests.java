@@ -2,7 +2,7 @@ package com.urilvv.GymApplicationEpam.service_tests;
 
 import com.urilvv.GymApplicationEpam.daos.TraineeDAO;
 import com.urilvv.GymApplicationEpam.models.Trainee;
-import com.urilvv.GymApplicationEpam.services.TraineeService;
+import com.urilvv.GymApplicationEpam.services.servicesImpl.TraineeServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,12 +28,12 @@ public class TraineeServiceTests {
     private TraineeDAO traineeDAO;
 
     @InjectMocks
-    private TraineeService traineeService;
+    private TraineeServiceImpl traineeService;
 
     @BeforeEach
     public void init() {
         traineeDAO = new TraineeDAO(traineeStorage);
-        traineeService = new TraineeService(traineeDAO);
+        traineeService = new TraineeServiceImpl(traineeDAO);
     }
 
     @Test

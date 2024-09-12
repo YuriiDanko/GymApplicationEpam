@@ -5,7 +5,7 @@ import com.urilvv.GymApplicationEpam.enums.TrainingType;
 import com.urilvv.GymApplicationEpam.models.Trainee;
 import com.urilvv.GymApplicationEpam.models.Trainer;
 import com.urilvv.GymApplicationEpam.models.Training;
-import com.urilvv.GymApplicationEpam.services.TrainingService;
+import com.urilvv.GymApplicationEpam.services.servicesImpl.TrainingServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,12 +29,12 @@ public class TrainingServiceTests {
     @InjectMocks
     private TrainingDAO trainingDAO;
     @InjectMocks
-    private TrainingService trainingService;
+    private TrainingServiceImpl trainingService;
 
     @BeforeEach
     public void init() {
         trainingDAO = new TrainingDAO(trainingStorage);
-        trainingService = new TrainingService(trainingDAO);
+        trainingService = new TrainingServiceImpl(trainingDAO);
     }
 
     @Test
