@@ -2,8 +2,7 @@ package com.urilvv.GymApplicationEpam.daos;
 
 import com.urilvv.GymApplicationEpam.enums.TrainingType;
 import com.urilvv.GymApplicationEpam.models.Training;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
@@ -12,10 +11,10 @@ import java.time.LocalTime;
 import java.util.Map;
 
 @Component
+@Slf4j
 public class TrainingDAO {
 
-    private Map<String, Training> trainingStorage;
-    private final Logger logger = LoggerFactory.getLogger(TrainerDAO.class);
+    private final Map<String, Training> trainingStorage;
 
     public TrainingDAO(@Qualifier("trainingStorage") Map<String, Training> trainingStorage) {
         this.trainingStorage = trainingStorage;
@@ -28,7 +27,7 @@ public class TrainingDAO {
 
         trainingStorage.put(training.getTrainingId(), training);
 
-        logger.info("Training session with given id - " + training.getTrainingId() + " was scheduled.");
+        log.info("Training session with given id - " + training.getTrainingId() + " was scheduled.");
 
         return training;
     }

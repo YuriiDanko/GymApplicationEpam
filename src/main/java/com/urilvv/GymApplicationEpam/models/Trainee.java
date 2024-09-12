@@ -1,8 +1,13 @@
 package com.urilvv.GymApplicationEpam.models;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+
 import java.time.LocalDate;
 import java.time.Period;
 
+@Data
+@EqualsAndHashCode(callSuper = true)
 public class Trainee extends User {
 
     private LocalDate dateOfBirth;
@@ -12,22 +17,6 @@ public class Trainee extends User {
                    boolean isActive, LocalDate dateOfBirth, String address) {
         super(firstName, lastName, username, isActive);
         this.dateOfBirth = dateOfBirth;
-        this.address = address;
-    }
-
-    public LocalDate getDateOfBirth() {
-        return dateOfBirth;
-    }
-
-    public void setDateOfBirth(LocalDate dateOfBirth) {
-        this.dateOfBirth = dateOfBirth;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
         this.address = address;
     }
 

@@ -1,5 +1,7 @@
 package com.urilvv.GymApplicationEpam.models;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.passay.CharacterRule;
 import org.passay.EnglishCharacterData;
 import org.passay.PasswordGenerator;
@@ -8,6 +10,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
+@Data
+@NoArgsConstructor
 public abstract class User {
 
     private String userId;
@@ -24,49 +28,6 @@ public abstract class User {
         this.password = generatePassword();
         this.username = username;
         this.isActive = isActive;
-    }
-
-    public User() {
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    public String getFirstName() {
-        return firstName;
-    }
-
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-    }
-
-    public String getLastName() {
-        return lastName;
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
     }
 
     public boolean isActive() {

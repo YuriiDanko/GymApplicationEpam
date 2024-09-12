@@ -1,8 +1,7 @@
 package com.urilvv.GymApplicationEpam.daos;
 
 import com.urilvv.GymApplicationEpam.models.Trainer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
@@ -10,10 +9,10 @@ import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
 @Component
+@Slf4j
 public class TrainerDAO implements Validation {
 
-    private Map<String, Trainer> trainerStorage;
-    private final Logger logger = LoggerFactory.getLogger(TrainerDAO.class);
+    private final Map<String, Trainer> trainerStorage;
 
     public TrainerDAO(@Qualifier("trainerStorage") Map<String, Trainer> trainerStorage) {
         this.trainerStorage = trainerStorage;
@@ -22,7 +21,12 @@ public class TrainerDAO implements Validation {
     public Trainer createTrainer(String firstName, String lastName,
                                  String username, boolean isActive, String spec) {
         if (validate(username)) {
-            username += "#" + ThreadLocalRandom.current().nextInt(1, 999);
+            String plainUsername = username;
+            while(validate(plainUsername)) {
+                plainUsername = username + "#" + ThreadLocalRandom.current().nextInt(1, 999);
+            }
+
+            username = plainUsername;
         }
 
         Trainer trainer = new Trainer(firstName,
@@ -33,7 +37,7 @@ public class TrainerDAO implements Validation {
 
         trainerStorage.put(trainer.getUserId(), trainer);
 
-        logger.info("Trainer with user_id - " + trainer.getUserId() + " was created.");
+        log.info("Trainer with user_id - " + trainer.getUserId() + " was created.");
 
         return trainer;
     }
@@ -48,7 +52,7 @@ public class TrainerDAO implements Validation {
 
         trainerStorage.put(userId, edited);
 
-        logger.info("Trainer with user_id - " + userId + " was edited.");
+        log.info("Trainer with user_id - " + userId + " was edited.");
 
         return edited;
     }
