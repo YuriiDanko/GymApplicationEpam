@@ -11,7 +11,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Data
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(exclude = "traineeTrainings", callSuper = false)
 @ToString(callSuper = true)
 @Entity
 @Table(name = "trainees")
@@ -38,11 +38,6 @@ public class Trainee extends User {
     public void addTraining(Training training) {
         getTraineeTrainings().add(training);
         training.setTrainee(this);
-    }
-
-    public void removeTraining(Training training) {
-        getTraineeTrainings().remove(training);
-        training.setTrainee(null);
     }
 
 }

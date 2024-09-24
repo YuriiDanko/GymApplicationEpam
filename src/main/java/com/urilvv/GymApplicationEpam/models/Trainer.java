@@ -11,7 +11,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Data
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(exclude = "trainerTrainings", callSuper = false)
 @ToString(callSuper = true)
 @Entity
 @Table(name = "trainers")
@@ -19,7 +19,7 @@ import java.util.Set;
 public class Trainer extends User {
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "trainer_specialization")
+    @Column(name = "trainer_specialization", nullable = false)
     private Specialization trainerSpec;
     @OneToMany(mappedBy = "trainer", cascade = CascadeType.ALL,
             orphanRemoval = true, fetch = FetchType.EAGER)
@@ -35,11 +35,6 @@ public class Trainer extends User {
     public void addTraining(Training training) {
         getTrainerTrainings().add(training);
         training.setTrainer(this);
-    }
-
-    public void removeTraining(Training training) {
-        getTrainerTrainings().remove(training);
-        training.setTrainer(null);
     }
 
 }
