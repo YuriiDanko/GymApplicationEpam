@@ -1,83 +1,176 @@
 package com.urilvv.GymApplicationEpam.daos;
 
+import com.urilvv.GymApplicationEpam.enums.TrainingType;
 import com.urilvv.GymApplicationEpam.models.Trainee;
+import com.urilvv.GymApplicationEpam.models.Training;
+import com.urilvv.GymApplicationEpam.models.User;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
+import jakarta.transaction.Transactional;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Component;
+import org.passay.PasswordData;
+import org.passay.PasswordValidator;
+import org.passay.RuleResult;
+import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
-import java.util.Map;
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.List;
+import java.util.Optional;
 
-@Component
+@Repository
 @Slf4j
+@Data
 public class TraineeDAO implements Validation {
 
-    private final Map<String, Trainee> traineeStorage;
+    @PersistenceContext
+    private EntityManager entityManager;
+    private final PasswordValidator passwordValidator;
 
-    public TraineeDAO(@Qualifier("traineeStorage") Map<String, Trainee> traineeStorage) {
-        this.traineeStorage = traineeStorage;
+    public TraineeDAO(PasswordValidator passwordValidator) {
+        this.passwordValidator = passwordValidator;
     }
 
+    @Transactional
     public Trainee createTrainee(String firstName, String lastName, String username,
                                  boolean isActive, LocalDate dateOfBirth, String address) {
-        if (validate(username)) {
-            String plainUsername = username;
-            while(validate(plainUsername)) {
-                plainUsername = username + "#" + ThreadLocalRandom.current().nextInt(1, 999);
-            }
-
-            username = plainUsername;
-        }
-
         Trainee trainee = new Trainee(firstName, lastName, username,
                 isActive, dateOfBirth, address);
 
-        traineeStorage.put(trainee.getUserId(), trainee);
+        while (validate(trainee)) {
+            trainee.setUsername(User.generateUsername(username));
+        }
+
+        entityManager.persist(trainee);
 
         log.info("Trainee with user_id - " + trainee.getUserId() + " was created.");
 
         return trainee;
     }
 
-    public boolean deleteTrainee(String userId) {
-        if (!traineeStorage.containsKey(userId)) {
-            log.error("Trainee with given user_id does not exist!");
-            return false;
+    @Transactional
+    public boolean deleteTrainee(String username) {
+        entityManager.createQuery("delete from Training t where t.trainee.username = :username")
+                .setParameter("username", username)
+                .executeUpdate();
+
+        int updatedEntities = entityManager.createQuery("delete from Trainee t where t.username = :username")
+                .setParameter("username", username)
+                .executeUpdate();
+
+        log.info("Trainee with username - " + username + " was deleted.");
+
+        return updatedEntities == 1;
+    }
+
+    @Transactional
+    public Trainee editTrainee(String userId, String firstName, String lastName,
+                               LocalDate dateOfBirth, String address) {
+        Trainee trainee = entityManager.find(Trainee.class, userId);
+        entityManager.detach(trainee);
+        trainee.setFirstName(firstName);
+        trainee.setLastName(lastName);
+        trainee.setUsername(firstName + "." + lastName);
+        trainee.setDateOfBirth(dateOfBirth);
+        trainee.setAddress(address);
+
+        while (validate(trainee)) {
+            trainee.setUsername(User.generateUsername(trainee.getFirstName() + "." + trainee.getLastName()));
         }
 
-        traineeStorage.remove(userId);
+        entityManager.merge(trainee);
 
-        log.info("Trainee with user_id - " + userId + " was deleted.");
-
-        return true;
+        return trainee;
     }
 
-    public Trainee editTrainee(String userId, String firstName, String lastName, String username,
-                               boolean isActive, LocalDate dateOfBirth, String address) {
+    @Transactional
+    public void changePassword(String userId, String newPassword, String oldPassword) {
+        Trainee trainee = entityManager.find(Trainee.class, userId);
 
-        Trainee edited = new Trainee(firstName, lastName, username,
-                isActive, dateOfBirth, address);
+        if (!trainee.getPassword().equals(oldPassword)) {
+            log.error("Password is not correct. Try again.");
+            throw new IllegalArgumentException("Password is not correct. Try again.");
+        } else if (newPassword.equals(oldPassword)) {
+            log.error("Enter new password instead of old one.");
+            throw new IllegalArgumentException("Enter new password instead of old one.");
+        }
 
-        traineeStorage.put(userId, edited);
+        RuleResult passwordValidation = passwordValidator.validate(new PasswordData(newPassword));
 
-        log.info("Trainee with user_id - " + userId + " was edited.");
+        if (passwordValidation.isValid()) {
+            log.info("Password for Trainee with user_id - " + userId + " was changed.");
+            entityManager.detach(trainee);
+            trainee.setPassword(newPassword);
+            entityManager.merge(trainee);
+            return;
+        }
 
-        return edited;
+        log.error("""
+                \nPassword need to follow next rules:
+                \tShould contain between 10 to 18 characters;
+                \tShould contain 1 UpperCase symbol;
+                \tShould contain 1 LowerCase symbol;
+                \tShould contain 1 Digit symbol;
+                \tShould not contain any whitespaces.
+                """);
+
+        throw new IllegalArgumentException("Password was not validated.");
     }
 
-    public Trainee selectTrainee(String userId) {
-        return traineeStorage.get(userId);
+    @Transactional
+    public void changeActiveStatus(String userId) {
+        Trainee trainee = entityManager.find(Trainee.class, userId);
+        entityManager.detach(trainee);
+        trainee.setActive(!trainee.isActive());
+        entityManager.merge(trainee);
+        log.info("Active Status for Trainee with user_id - " + userId + " was changed to " + trainee.isActive() + ".");
+    }
+
+    public Optional<Trainee> selectTrainee(String username) {
+        List<Trainee> resultList = entityManager.createQuery("select t from Trainee t where t.username = :username", Trainee.class)
+                .setParameter("username", username)
+                .getResultList();
+
+        if (resultList.isEmpty()) {
+            log.warn("No Trainee found with given username - " + username);
+            return Optional.empty();
+        }
+
+        log.info("Trainee profile with user_id - " + resultList.get(0).getUserId() + " was returned.");
+        return Optional.ofNullable(resultList.get(0));
+    }
+
+    public List<Trainee> getAllTrainees() {
+        log.info("List of Trainees was returned.");
+        return entityManager.createQuery("select t from Trainee t left outer join Training tr on t.userId = tr.trainee.userId", Trainee.class)
+                .getResultList();
+    }
+
+    public List<Training> getTraineeTrainingList(String traineeUsername, LocalDate from,
+                                                 LocalDate to, String trainerUsername, TrainingType type) {
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Training> criteriaQuery = criteriaBuilder.createQuery(Training.class);
+
+        Root<Training> trainingRoot = criteriaQuery.from(Training.class);
+
+        Predicate traineeUsernamePredicate = criteriaBuilder.like(trainingRoot.get("trainee").get("username"), traineeUsername);
+        Predicate fromToDatePredicate = criteriaBuilder.between(trainingRoot.get("trainingTime"), from, to);
+        Predicate trainerUsernamePredicate = criteriaBuilder.like(trainingRoot.get("trainer").get("username"), trainerUsername);
+        Predicate trainingTypePredicate = criteriaBuilder.like(trainingRoot.get("trainingType"), type.name());
+
+        criteriaQuery.select(trainingRoot).where(criteriaBuilder.and(traineeUsernamePredicate, fromToDatePredicate,
+                trainerUsernamePredicate, trainingTypePredicate));
+
+        return entityManager.createQuery(criteriaQuery).getResultList();
     }
 
     @Override
-    public boolean validate(String username) {
-        for (Trainee entry : traineeStorage.values()) {
-            if (entry.getUsername().equals(username)) {
-                return true;
-            }
-        }
-
-        return false;
+    public <T extends User> boolean validate(T trainee) {
+        return selectTrainee(trainee.getUsername()).isPresent();
     }
+
 }
