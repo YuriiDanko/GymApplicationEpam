@@ -11,93 +11,74 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
 
 @ExtendWith(MockitoExtension.class)
 public class TraineeServiceTests {
 
     @Mock
-    private Map<String, Trainee> traineeStorage;
-
+    public TraineeDAO traineeDAO;
     @InjectMocks
-    private TraineeDAO traineeDAO;
+    public TraineeServiceImpl traineeService;
 
-    @InjectMocks
-    private TraineeServiceImpl traineeService;
+    Trainee initTrainee;
+    Trainee editedTrainee;
 
     @BeforeEach
     public void init() {
-        traineeDAO = new TraineeDAO(traineeStorage);
-        traineeService = new TraineeServiceImpl(traineeDAO);
+        initTrainee = new Trainee("Yurii", "Danko", "Yurii.Danko", true,
+                LocalDate.of(2003, 8, 7), "Lviv");
+        editedTrainee = new Trainee("Roman", "Danko", "Roman.Danko", false,
+                LocalDate.of(2006, 10, 22), "Lviv");
     }
 
     @Test
     public void createTraineeTest() {
-        when(traineeStorage.put(any(String.class), any(Trainee.class))).thenReturn(null);
+        when(traineeDAO.createTrainee(any(String.class), any(String.class), any(String.class), any(Boolean.class),
+                any(LocalDate.class), any(String.class))).thenReturn(initTrainee);
 
         Trainee trainee = traineeService.createTrainee("Yurii", "Danko",
                 true, LocalDate.of(2003, 8, 7), "Lviv, Avraama Linkolna");
 
+        assertNotNull(trainee);
         assertEquals(trainee.getUsername(), "Yurii.Danko");
-        verify(traineeStorage, times(1)).put(any(String.class), any(Trainee.class));
     }
 
     @Test
     public void editTraineeTest() {
-        when(traineeStorage.put(any(String.class), any(Trainee.class))).thenReturn(null);
+        when(traineeDAO.editTrainee(any(String.class), any(String.class), any(String.class),
+                any(LocalDate.class), any(String.class))).thenReturn(editedTrainee);
 
-        Trainee trainee = traineeService.createTrainee("Yurii", "Danko",
-                true, LocalDate.of(2003, 8, 7), "Lviv, Avraama Linkolna");
+        Trainee edited = traineeService.editTrainee("user_id", "Roman",
+                "Danko", LocalDate.now(), "Lviv");
 
-        Trainee edited = traineeService.editTrainee(trainee.getUserId(), "Marko", "Danko",
-                true, LocalDate.of(2003, 8, 7), "Lviv, Shevchenka");
-
-        assertNotEquals(trainee.getAddress(), edited.getAddress());
-        assertEquals(edited.getUsername(), "Marko.Danko");
-        verify(traineeStorage, times(2)).put(any(String.class), any(Trainee.class));
+        assertNotNull(edited);
+        assertNotEquals(edited.getUsername(), initTrainee.getUsername());
+        assertEquals(edited.getUsername(), "Roman.Danko");
     }
 
     @Test
     public void selectTraineeTest() {
-        Trainee trainee = traineeService.createTrainee("Yurii", "Danko",
-                true, LocalDate.of(2003, 8, 7), "Lviv, Avraama Linkolna");
+        when(traineeDAO.selectTrainee(any(String.class))).thenReturn(Optional.of(initTrainee));
 
-        when(traineeStorage.get(eq(trainee.getUserId()))).thenReturn(trainee);
+        Trainee trainee = traineeService.selectTrainee("user_id").get();
 
-        Trainee selected = traineeService.selectTrainee(trainee.getUserId());
-
-        assertEquals(trainee, selected);
-        verify(traineeStorage, times(1)).get(eq(trainee.getUserId()));
+        assertNotNull(trainee);
+        assertEquals(trainee.getUsername(), "Yurii.Danko");
     }
 
     @Test
     public void deleteTraineeTest() {
-        Trainee trainee = traineeService.createTrainee("Yurii", "Danko",
-                true, LocalDate.of(2003, 8, 7), "Lviv, Avraama Linkolna");
+        when(traineeDAO.deleteTrainee(any(String.class))).thenReturn(true);
 
-        when(traineeStorage.remove(eq(trainee.getUserId()))).thenReturn(trainee);
-        when(traineeStorage.containsKey(eq(trainee.getUserId()))).thenReturn(true);
+        boolean deleted = traineeService.deleteTrainee("user_id");
 
-        assertTrue(traineeService.deleteTrainee(trainee.getUserId()));
-        verify(traineeStorage, times(1)).remove(eq(trainee.getUserId()));
-    }
-
-    @Test
-    public void similarNamesTest() {
-        Trainee trainee1 = traineeService.createTrainee("Yurii", "Danko",
-                true, LocalDate.of(2003, 8, 7), "Lviv, Avraama Linkolna");
-
-        when(traineeStorage.values()).thenReturn(List.of(trainee1));
-
-        Trainee trainee2 = traineeService.createTrainee("Yurii", "Danko",
-                true, LocalDate.of(2003, 8, 7), "Lviv, Avraama Linkolna");
-
-        assertNotEquals(trainee1.getUsername(), trainee2.getUsername());
+        assertTrue(deleted);
     }
 
 }

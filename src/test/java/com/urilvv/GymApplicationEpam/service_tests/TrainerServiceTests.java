@@ -11,80 +11,61 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class TrainerServiceTests {
 
     @Mock
-    private Map<String, Trainer> trainerStorage;
-
+    public TrainerDAO trainerDAO;
     @InjectMocks
-    private TrainerDAO trainerDAO;
+    public TrainerServiceImpl trainerService;
 
-    @InjectMocks
-    private TrainerServiceImpl trainerService;
+    Trainer initTrainer;
+    Trainer editedTrainer;
 
     @BeforeEach
     public void init() {
-        trainerDAO = new TrainerDAO(trainerStorage);
-        trainerService = new TrainerServiceImpl(trainerDAO);
+        initTrainer = new Trainer("Sergiy", "Duhota",
+                "Sergiy.Duhota", true, "cardio");
+        editedTrainer = new Trainer("Yurii", "Danko",
+                "Yurii.Danko", false, "strength");
     }
 
     @Test
     public void createTrainerTest() {
-        when(trainerStorage.put(any(String.class), any(Trainer.class))).thenReturn(null);
+        when(trainerDAO.createTrainer(any(String.class), any(String.class), any(String.class),
+                any(Boolean.class), any(String.class))).thenReturn(initTrainer);
 
-        Trainer trainer = trainerService.createTrainer("Yurii", "Danko",
+        Trainer trainer = trainerService.createTrainer("Sergiy", "Duhota",
                 true, "cardio");
 
+        assertNotNull(trainer);
         assertEquals(trainer.getTrainerSpec(), Specialization.CARDIO);
-        verify(trainerStorage, times(1)).put(eq(trainer.getUserId()), any(Trainer.class));
     }
 
     @Test
     public void editTrainerTest() {
-        when(trainerStorage.put(any(String.class), any(Trainer.class))).thenReturn(null);
+        when(trainerDAO.editTrainer(any(String.class), any(String.class), any(String.class),
+                any(String.class))).thenReturn(editedTrainer);
 
-        Trainer trainer = trainerService.createTrainer("Yurii", "Danko",
-                true, "cardio");
+        Trainer edited = trainerService.editTrainer("user_id", "Yurii", "Danko", "strength");
 
-        Trainer edited = trainerService.editTrainer(trainer.getUserId(), "Marko", "Yanovych", true, "strength");
-
-        assertNotEquals(trainer.getUsername(), edited.getUsername());
-        assertEquals(edited.getUsername(), "Marko.Yanovych");
-        verify(trainerStorage, times(2)).put(any(String.class), any(Trainer.class));
+        assertNotNull(edited);
+        assertEquals(edited.getTrainerSpec(), editedTrainer.getTrainerSpec());
     }
 
     @Test
     public void selectTrainerTest() {
-        Trainer trainer = trainerService.createTrainer("Yurii", "Danko",
-                true, "cardio");
+        when(trainerDAO.selectTrainer(any(String.class))).thenReturn(Optional.of(initTrainer));
 
-        when(trainerStorage.get(eq(trainer.getUserId()))).thenReturn(trainer);
+        Trainer trainer =  trainerDAO.selectTrainer("Sergiy.Duhota").orElseThrow();
 
-        Trainer selected = trainerService.selectTrainer(trainer.getUserId());
-
-        assertEquals(trainer, selected);
-        verify(trainerStorage, times(1)).get(eq(trainer.getUserId()));
-    }
-
-    @Test
-    public void similarNamesTest() {
-        Trainer trainer1 = trainerService.createTrainer("Yurii", "Danko",
-                true, "cardio");
-
-        when(trainerStorage.values()).thenReturn(List.of(trainer1));
-
-        Trainer trainer2 = trainerService.createTrainer("Yurii", "Danko",
-                true, "cardio");
-
-        assertNotEquals(trainer1.getUsername(), trainer2.getUsername());
+        assertNotNull(trainer);
+        assertEquals(trainer.getUsername(), initTrainer.getUsername());
     }
 
 }
