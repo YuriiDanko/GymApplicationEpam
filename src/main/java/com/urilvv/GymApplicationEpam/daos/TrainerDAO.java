@@ -10,7 +10,7 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.passay.PasswordData;
@@ -75,7 +75,8 @@ public class TrainerDAO implements Validation {
     }
 
     public Optional<Trainer> selectTrainer(String username) {
-        List<Trainer> resultList = entityManager.createQuery("select t from Trainer t where t.username = :username", Trainer.class)
+        List<Trainer> resultList = entityManager.createQuery("select t from Trainer t left join fetch t.trainerTrainings " +
+                        "where t.username = :username", Trainer.class)
                 .setParameter("username", username)
                 .getResultList();
 

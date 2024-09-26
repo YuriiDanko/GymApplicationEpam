@@ -21,8 +21,7 @@ public class Trainer extends User {
     @Enumerated(EnumType.STRING)
     @Column(name = "trainer_specialization", nullable = false)
     private Specialization trainerSpec;
-    @OneToMany(mappedBy = "trainer", cascade = CascadeType.ALL,
-            orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "trainer", cascade = CascadeType.ALL)
     @ToString.Exclude
     private Set<Training> trainerTrainings;
 

@@ -10,13 +10,13 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
-import jakarta.transaction.Transactional;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.passay.PasswordData;
 import org.passay.PasswordValidator;
 import org.passay.RuleResult;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -54,10 +54,6 @@ public class TraineeDAO implements Validation {
 
     @Transactional
     public boolean deleteTrainee(String username) {
-        entityManager.createQuery("delete from Training t where t.trainee.username = :username")
-                .setParameter("username", username)
-                .executeUpdate();
-
         int updatedEntities = entityManager.createQuery("delete from Trainee t where t.username = :username")
                 .setParameter("username", username)
                 .executeUpdate();
@@ -131,7 +127,8 @@ public class TraineeDAO implements Validation {
     }
 
     public Optional<Trainee> selectTrainee(String username) {
-        List<Trainee> resultList = entityManager.createQuery("select t from Trainee t where t.username = :username", Trainee.class)
+        List<Trainee> resultList = entityManager.createQuery("select t from Trainee t left join fetch t.traineeTrainings " +
+                        "where t.username = :username", Trainee.class)
                 .setParameter("username", username)
                 .getResultList();
 
