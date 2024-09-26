@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -22,8 +24,7 @@ public class Trainee extends User {
     private LocalDate dateOfBirth;
     @Column(name = "trainee_address", nullable = false)
     private String address;
-    @OneToMany(mappedBy = "trainee", cascade = CascadeType.ALL,
-            orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "trainee", cascade = CascadeType.ALL)
     @ToString.Exclude
     private Set<Training> traineeTrainings;
 

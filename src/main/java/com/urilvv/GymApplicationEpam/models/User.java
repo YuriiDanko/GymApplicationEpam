@@ -8,7 +8,6 @@ import org.passay.EnglishCharacterData;
 import org.passay.PasswordGenerator;
 
 import java.util.Arrays;
-import java.util.Base64;
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;
 
