@@ -1,7 +1,9 @@
 package com.urilvv.GymApplicationEpam.daos;
 
+import com.urilvv.GymApplicationEpam.models.User;
+
 public interface Validation {
 
-    boolean validate(String username);
+    <T extends User> boolean validate(T entity);
 
 }
