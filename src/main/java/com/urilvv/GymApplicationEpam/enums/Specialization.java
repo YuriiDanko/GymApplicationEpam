@@ -1,5 +1,8 @@
 package com.urilvv.GymApplicationEpam.enums;
 
+import lombok.Getter;
+
+@Getter
 public enum Specialization {
 
     CARDIO("cardio_spec"), STRENGTH("strength_spec"), BODYBUILDING("bodybuilding_spec");
@@ -8,10 +11,6 @@ public enum Specialization {
 
     Specialization(String name) {
         this.name = name;
-    }
-
-    public String getName() {
-        return this.name;
     }
 
     public static Specialization getSpec(String name){

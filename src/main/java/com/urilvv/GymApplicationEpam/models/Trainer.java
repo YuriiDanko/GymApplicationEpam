@@ -1,5 +1,6 @@
 package com.urilvv.GymApplicationEpam.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.urilvv.GymApplicationEpam.enums.Specialization;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -19,10 +20,11 @@ import java.util.Set;
 public class Trainer extends User {
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "trainer_specialization", nullable = false)
+    @Column(name = "trainer_specialization")
     private Specialization trainerSpec;
     @OneToMany(mappedBy = "trainer", cascade = CascadeType.ALL)
     @ToString.Exclude
+    @JsonIgnore
     private Set<Training> trainerTrainings;
 
     public Trainer(String firstName, String lastName, String username, boolean isActive, String spec) {
