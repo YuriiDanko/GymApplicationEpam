@@ -34,8 +34,8 @@ public class TraineeServiceImpl implements TraineeService {
         return traineeDAO.deleteTrainee(userId);
     }
 
-    public Optional<Trainee> selectTrainee(String userId) {
-        return traineeDAO.selectTrainee(userId);
+    public Optional<Trainee> selectTrainee(String username) {
+        return traineeDAO.selectTrainee(username);
     }
 
     public void changePassword(String userId, String newPassword, String oldPassword) {

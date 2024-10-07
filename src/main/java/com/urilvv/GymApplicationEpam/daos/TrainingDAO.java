@@ -62,4 +62,10 @@ public class TrainingDAO {
         return updatedEntities == 1;
     }
 
+    public List<Training> getAllTrainings() {
+        log.info("List of Trainings was returned.");
+        return entityManager.createQuery("from Training", Training.class)
+                .getResultList();
+    }
+
 }
