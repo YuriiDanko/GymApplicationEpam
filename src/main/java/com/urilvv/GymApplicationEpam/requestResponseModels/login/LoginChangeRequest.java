@@ -11,8 +11,6 @@ import lombok.Setter;
 public class LoginChangeRequest {
 
     @NotBlank
-    private String userId;
-    @NotBlank
     private String oldPassword;
     @NotBlank
     private String newPassword;

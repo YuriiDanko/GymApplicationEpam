@@ -56,7 +56,7 @@ public class TraineeController {
         return new ResponseEntity<>(isDeleted, HttpStatus.OK);
     }
 
-    @GetMapping("/trainee/{username}/trainings")
+    @GetMapping("/{username}/trainings")
     public ResponseEntity<List<TrainingDTO>> getTraineeTrainings(@PathVariable String username,
                                                                  @Valid @RequestBody TraineeTrainingsReq trainingsRequest) {
         List<TrainingDTO> trainings = traineeService.getTraineeTrainingList(username, trainingsRequest.getFrom(),
@@ -66,19 +66,20 @@ public class TraineeController {
         return new ResponseEntity<>(trainings, HttpStatus.OK);
     }
 
-    @PutMapping("/trainee/change-password")
-    public ResponseEntity<String> changeTraineePassword(@Valid @RequestBody LoginChangeRequest loginChangeReq) {
-        traineeService.changePassword(loginChangeReq.getUserId(), loginChangeReq.getOldPassword(), loginChangeReq.getNewPassword());
+    @PutMapping("/{user_id}/change-password")
+    public ResponseEntity<String> changeTraineePassword(@PathVariable("user_id") String userId,
+                                                        @Valid @RequestBody LoginChangeRequest loginChangeReq) {
+        traineeService.changePassword(userId, loginChangeReq.getOldPassword(), loginChangeReq.getNewPassword());
         return ResponseEntity.status(HttpStatus.ACCEPTED).body("Password was changed successfully!");
     }
 
-    @PatchMapping("/trainee/{user_id}/change-active-status")
+    @PatchMapping("/{user_id}/change-active-status")
     public ResponseEntity<String> changeActiveStatus(@PathVariable("user_id") String userId) {
         traineeService.changeActiveStatus(userId);
         return ResponseEntity.status(HttpStatus.OK).body("Active status was changed successfully!");
     }
 
-    @PutMapping("/trainee/{user_id}/update-profile")
+    @PutMapping("/{user_id}/update-profile")
     public ResponseEntity<TraineeDTO> updateTraineeProfile(@PathVariable("user_id") String userId,
                                                            @RequestBody TraineeEditRequest traineeEditReq) {
         TraineeDTO traineeDTO = mapper.mapTrainee(traineeService.editTrainee(userId, traineeEditReq.getFirstName(), traineeEditReq.getLastName(),

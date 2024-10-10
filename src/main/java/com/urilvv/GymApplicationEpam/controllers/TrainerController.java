@@ -49,19 +49,20 @@ public class TrainerController {
         return new ResponseEntity<>(mapper.mapTrainer(trainer), HttpStatus.OK);
     }
 
-    @PatchMapping("/trainer/{user_id}/change-active-status")
+    @PatchMapping("/{user_id}/change-active-status")
     public ResponseEntity<String> changeActiveStatus(@PathVariable("user_id") String userId) {
         trainerService.changeActiveStatus(userId);
         return ResponseEntity.status(HttpStatus.OK).body("Active status was changed successfully!");
     }
 
-    @PutMapping("/trainer/change-password")
-    public ResponseEntity<String> changeTraineePassword(@Valid @RequestBody LoginChangeRequest loginChangeReq) {
-        trainerService.changePassword(loginChangeReq.getUserId(), loginChangeReq.getOldPassword(), loginChangeReq.getNewPassword());
+    @PutMapping("/{user_id}/change-password")
+    public ResponseEntity<String> changeTraineePassword(@PathVariable("user_id") String userId,
+                                                        @Valid @RequestBody LoginChangeRequest loginChangeReq) {
+        trainerService.changePassword(userId, loginChangeReq.getOldPassword(), loginChangeReq.getNewPassword());
         return ResponseEntity.status(HttpStatus.ACCEPTED).body("Password was changed successfully!");
     }
 
-    @PutMapping("/trainer/{user_id}/update-profile")
+    @PutMapping("/{user_id}/update-profile")
     public ResponseEntity<TrainerDTO> updateTrainerProfile(@PathVariable("user_id") String userId,
                                                            @RequestBody TrainerEditRequest trainerEditReq) {
         TrainerDTO trainerDTO = mapper.mapTrainer(trainerService.editTrainer(userId, trainerEditReq.getFirstName(),
@@ -69,7 +70,7 @@ public class TrainerController {
         return new ResponseEntity<>(trainerDTO, HttpStatus.OK);
     }
 
-    @GetMapping("trainer/{username}/trainings")
+    @GetMapping("/{username}/trainings")
     public ResponseEntity<List<TrainingDTO>> getTrainerTrainings(@PathVariable String username,
                                                                  @Valid @RequestBody TrainerTrainingsReq trainerTrainingsReq) {
         List<TrainingDTO> trainings = trainerService.getTrainerTrainingList(username, trainerTrainingsReq.getFrom(),
