@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
@@ -36,6 +37,7 @@ public class TrainingServiceTests {
 
     @BeforeEach
     public void init() {
+        MockitoAnnotations.openMocks(this);
         trainee = new Trainee("Yurii", "Danko", "Yurii.Danko", true,
                 LocalDate.of(2003, 8, 7), "Lviv");
         trainer = new Trainer("Sergiy", "Duhota",

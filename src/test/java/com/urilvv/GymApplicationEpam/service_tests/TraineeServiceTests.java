@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
@@ -16,7 +17,6 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
-
 
 @ExtendWith(MockitoExtension.class)
 public class TraineeServiceTests {
@@ -31,6 +31,7 @@ public class TraineeServiceTests {
 
     @BeforeEach
     public void init() {
+        MockitoAnnotations.openMocks(this);
         initTrainee = new Trainee("Yurii", "Danko", "Yurii.Danko", true,
                 LocalDate.of(2003, 8, 7), "Lviv");
         editedTrainee = new Trainee("Roman", "Danko", "Roman.Danko", false,
@@ -80,5 +81,7 @@ public class TraineeServiceTests {
 
         assertTrue(deleted);
     }
+
+
 
 }

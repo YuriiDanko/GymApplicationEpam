@@ -1,14 +1,13 @@
 package com.urilvv.GymApplicationEpam.dtos;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDate;
 
 @Getter
 @Setter
 @Builder
+@AllArgsConstructor
 public class TraineeDTO {
 
     private String userId;
