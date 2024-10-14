@@ -30,7 +30,6 @@ public class TrainerServiceTests {
 
     @BeforeEach
     public void init() {
-        MockitoAnnotations.openMocks(this);
         initTrainer = new Trainer("Sergiy", "Duhota",
                 "Sergiy.Duhota", true, "cardio");
         editedTrainer = new Trainer("Yurii", "Danko",

@@ -31,7 +31,6 @@ public class TraineeServiceTests {
 
     @BeforeEach
     public void init() {
-        MockitoAnnotations.openMocks(this);
         initTrainee = new Trainee("Yurii", "Danko", "Yurii.Danko", true,
                 LocalDate.of(2003, 8, 7), "Lviv");
         editedTrainee = new Trainee("Roman", "Danko", "Roman.Danko", false,
