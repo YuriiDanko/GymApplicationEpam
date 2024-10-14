@@ -1,6 +1,7 @@
 package com.urilvv.GymApplicationEpam.daos;
 
 import com.urilvv.GymApplicationEpam.enums.TrainingType;
+import com.urilvv.GymApplicationEpam.exceptions.UserNotFoundException;
 import com.urilvv.GymApplicationEpam.models.Trainee;
 import com.urilvv.GymApplicationEpam.models.Training;
 import com.urilvv.GymApplicationEpam.models.User;
@@ -53,24 +54,30 @@ public class TraineeDAO implements Validation {
     }
 
     @Transactional
-    public boolean deleteTrainee(String username) {
-        Trainee trainee = entityManager.find(Trainee.class, selectTrainee(username).get().getUserId());
+    public boolean deleteTrainee(String userId) {
+        Trainee trainee = entityManager.find(Trainee.class, userId);
 
         if(trainee != null) {
             entityManager.remove(trainee);
 
-            log.info("Trainee with username - " + username + " was deleted.");
+            log.info("Trainee with user_id - " + userId + " was deleted.");
             return true;
         }
 
-        log.warn("Trainee with username - " + username + " was not deleted. No record found.");
-        return false;
+        log.warn("Trainee with user_id - " + userId + " was not deleted. No record found.");
+        throw new UserNotFoundException("User with given user_id is not found!");
     }
 
     @Transactional
     public Trainee editTrainee(String userId, String firstName, String lastName,
                                LocalDate dateOfBirth, String address) {
         Trainee trainee = entityManager.find(Trainee.class, userId);
+
+        if(trainee == null) {
+            log.warn("User with given user_id is not found!");
+            throw new UserNotFoundException("User with given user_id is not found!");
+        }
+
         entityManager.detach(trainee);
         trainee.setFirstName(firstName);
         trainee.setLastName(lastName);
@@ -88,8 +95,13 @@ public class TraineeDAO implements Validation {
     }
 
     @Transactional
-    public void changePassword(String userId, String newPassword, String oldPassword) {
+    public void changePassword(String userId, String oldPassword, String newPassword) {
         Trainee trainee = entityManager.find(Trainee.class, userId);
+
+        if(trainee == null){
+            log.warn("User with given user_id is not found!");
+            throw new UserNotFoundException("User with given user_id is not found!");
+        }
 
         if (!trainee.getPassword().equals(oldPassword)) {
             log.error("Password is not correct. Try again.");
@@ -124,6 +136,12 @@ public class TraineeDAO implements Validation {
     @Transactional
     public void changeActiveStatus(String userId) {
         Trainee trainee = entityManager.find(Trainee.class, userId);
+
+        if(trainee == null) {
+            log.warn("User with given user_id is not found!");
+            throw new UserNotFoundException("User with given user_id is not found!");
+        }
+
         entityManager.detach(trainee);
         trainee.setActive(!trainee.isActive());
         entityManager.merge(trainee);
@@ -141,7 +159,7 @@ public class TraineeDAO implements Validation {
             return Optional.empty();
         }
 
-        log.info("Trainee profile with user_id - " + resultList.get(0).getUserId() + " was returned.");
+        log.info("Trainee profile with username - " + resultList.get(0).getUserId() + " was returned.");
         return Optional.ofNullable(resultList.get(0));
     }
 
@@ -163,8 +181,10 @@ public class TraineeDAO implements Validation {
         Predicate trainerUsernamePredicate = criteriaBuilder.like(trainingRoot.get("trainer").get("username"), trainerUsername);
         Predicate trainingTypePredicate = criteriaBuilder.like(trainingRoot.get("trainingType"), type.name());
 
-        criteriaQuery.select(trainingRoot).where(criteriaBuilder.and(traineeUsernamePredicate, fromToDatePredicate,
-                trainerUsernamePredicate, trainingTypePredicate));
+        criteriaQuery.select(trainingRoot).where(criteriaBuilder.and(traineeUsernamePredicate, trainerUsernamePredicate,
+                fromToDatePredicate, trainingTypePredicate));
+
+        log.info("Trainee related trainings were returned.");
 
         return entityManager.createQuery(criteriaQuery).getResultList();
     }

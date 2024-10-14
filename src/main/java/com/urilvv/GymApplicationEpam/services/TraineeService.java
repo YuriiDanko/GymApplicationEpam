@@ -18,7 +18,7 @@ public interface TraineeService {
 
     boolean deleteTrainee(String userId);
 
-    Optional<Trainee> selectTrainee(String userId);
+    Optional<Trainee> selectTrainee(String username);
 
     void changePassword(String userId, String newPassword, String oldPassword);
 

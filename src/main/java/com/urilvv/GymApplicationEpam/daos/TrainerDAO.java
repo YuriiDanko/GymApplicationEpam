@@ -1,6 +1,7 @@
 package com.urilvv.GymApplicationEpam.daos;
 
 import com.urilvv.GymApplicationEpam.enums.Specialization;
+import com.urilvv.GymApplicationEpam.exceptions.UserNotFoundException;
 import com.urilvv.GymApplicationEpam.models.Trainer;
 import com.urilvv.GymApplicationEpam.models.Training;
 import com.urilvv.GymApplicationEpam.models.User;
@@ -10,13 +11,13 @@ import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
 import jakarta.persistence.criteria.Root;
-import org.springframework.transaction.annotation.Transactional;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.passay.PasswordData;
 import org.passay.PasswordValidator;
 import org.passay.RuleResult;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -59,6 +60,12 @@ public class TrainerDAO implements Validation {
     public Trainer editTrainer(String userId, String firstName, String lastName,
                                String spec) {
         Trainer trainer = entityManager.find(Trainer.class, userId);
+
+        if(trainer == null) {
+            log.warn("User with given user_id is not found!");
+            throw new UserNotFoundException("User with given user_id is not found!");
+        }
+
         entityManager.detach(trainer);
         trainer.setFirstName(firstName);
         trainer.setLastName(lastName);
@@ -68,6 +75,8 @@ public class TrainerDAO implements Validation {
         while (validate(trainer)) {
             trainer.setUsername(User.generateUsername(trainer.getFirstName() + "." + trainer.getLastName()));
         }
+
+        log.info("Trainer with user_id - " + trainer.getUserId() + " was edited.");
 
         entityManager.merge(trainer);
 
@@ -96,8 +105,13 @@ public class TrainerDAO implements Validation {
     }
 
     @Transactional
-    public void changePassword(String userId, String newPassword, String oldPassword) {
+    public void changePassword(String userId, String oldPassword, String newPassword) {
         Trainer trainer = entityManager.find(Trainer.class, userId);
+
+        if(trainer == null) {
+            log.warn("User with given user_id is not found!");
+            throw new UserNotFoundException("User with given user_id is not found!");
+        }
 
         if(!trainer.getPassword().equals(oldPassword)) {
             log.error("Password is not correct. Try again.");
@@ -133,6 +147,12 @@ public class TrainerDAO implements Validation {
     @Transactional
     public void changeActiveStatus(String userId) {
         Trainer trainer = entityManager.find(Trainer.class, userId);
+
+        if(trainer == null) {
+            log.warn("User with given user_id is not found!");
+            throw new UserNotFoundException("User with given user_id is not found!");
+        }
+
         entityManager.detach(trainer);
         trainer.setActive(!trainer.isActive());
         entityManager.merge(trainer);
@@ -149,9 +169,10 @@ public class TrainerDAO implements Validation {
         Predicate fromToDatePredicate = criteriaBuilder.between(trainingRoot.get("trainingTime"), from, to);
         Predicate traineeUsernamePredicate = criteriaBuilder.like(trainingRoot.get("trainee").get("username"), traineeUsername);
 
+        criteriaQuery.select(trainingRoot).where(criteriaBuilder.and(traineeUsernamePredicate, trainerUsernamePredicate,
+                fromToDatePredicate));
 
-        criteriaQuery.select(trainingRoot).where(criteriaBuilder.and(trainerUsernamePredicate, fromToDatePredicate,
-                traineeUsernamePredicate));
+        log.info("Trainer related trainings were returned.");
 
         return entityManager.createQuery(criteriaQuery).getResultList();
     }

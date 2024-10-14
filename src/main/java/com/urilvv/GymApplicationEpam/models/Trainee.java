@@ -1,12 +1,11 @@
 package com.urilvv.GymApplicationEpam.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.LocalDate;
 import java.util.HashSet;
@@ -20,12 +19,13 @@ import java.util.Set;
 @NoArgsConstructor
 public class Trainee extends User {
 
-    @Column(name = "date_of_birth", nullable = false)
+    @Column(name = "date_of_birth")
     private LocalDate dateOfBirth;
-    @Column(name = "trainee_address", nullable = false)
+    @Column(name = "trainee_address")
     private String address;
     @OneToMany(mappedBy = "trainee", cascade = CascadeType.ALL)
     @ToString.Exclude
+    @JsonIgnore
     private Set<Training> traineeTrainings;
 
     public Trainee(String firstName, String lastName, String username,

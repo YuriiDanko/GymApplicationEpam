@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -30,6 +31,11 @@ public class TrainingServiceImpl implements TrainingService {
 
     public boolean deleteTraining(String userId) {
         return trainingDAO.deleteTraining(userId);
+    }
+
+    @Override
+    public List<Training> getAllTrainings() {
+        return trainingDAO.getAllTrainings();
     }
 
 }
