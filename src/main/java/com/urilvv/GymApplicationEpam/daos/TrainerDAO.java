@@ -1,7 +1,7 @@
 package com.urilvv.GymApplicationEpam.daos;
 
-import com.urilvv.GymApplicationEpam.controllers.ExceptionHandlerController;
 import com.urilvv.GymApplicationEpam.enums.Specialization;
+import com.urilvv.GymApplicationEpam.exceptions.UserNotFoundException;
 import com.urilvv.GymApplicationEpam.models.Trainer;
 import com.urilvv.GymApplicationEpam.models.Training;
 import com.urilvv.GymApplicationEpam.models.User;
@@ -63,7 +63,7 @@ public class TrainerDAO implements Validation {
 
         if(trainer == null) {
             log.warn("User with given user_id is not found!");
-            throw new ExceptionHandlerController.UserNotFoundException("User with given user_id is not found!");
+            throw new UserNotFoundException("User with given user_id is not found!");
         }
 
         entityManager.detach(trainer);
@@ -110,7 +110,7 @@ public class TrainerDAO implements Validation {
 
         if(trainer == null) {
             log.warn("User with given user_id is not found!");
-            throw new ExceptionHandlerController.UserNotFoundException("User with given user_id is not found!");
+            throw new UserNotFoundException("User with given user_id is not found!");
         }
 
         if(!trainer.getPassword().equals(oldPassword)) {
@@ -150,7 +150,7 @@ public class TrainerDAO implements Validation {
 
         if(trainer == null) {
             log.warn("User with given user_id is not found!");
-            throw new ExceptionHandlerController.UserNotFoundException("User with given user_id is not found!");
+            throw new UserNotFoundException("User with given user_id is not found!");
         }
 
         entityManager.detach(trainer);

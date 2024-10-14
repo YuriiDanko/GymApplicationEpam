@@ -1,7 +1,7 @@
 package com.urilvv.GymApplicationEpam.daos;
 
-import com.urilvv.GymApplicationEpam.controllers.ExceptionHandlerController;
 import com.urilvv.GymApplicationEpam.enums.TrainingType;
+import com.urilvv.GymApplicationEpam.exceptions.UserNotFoundException;
 import com.urilvv.GymApplicationEpam.models.Trainee;
 import com.urilvv.GymApplicationEpam.models.Training;
 import com.urilvv.GymApplicationEpam.models.User;
@@ -65,7 +65,7 @@ public class TraineeDAO implements Validation {
         }
 
         log.warn("Trainee with user_id - " + userId + " was not deleted. No record found.");
-        throw new ExceptionHandlerController.UserNotFoundException("User with given user_id is not found!");
+        throw new UserNotFoundException("User with given user_id is not found!");
     }
 
     @Transactional
@@ -75,7 +75,7 @@ public class TraineeDAO implements Validation {
 
         if(trainee == null) {
             log.warn("User with given user_id is not found!");
-            throw new ExceptionHandlerController.UserNotFoundException("User with given user_id is not found!");
+            throw new UserNotFoundException("User with given user_id is not found!");
         }
 
         entityManager.detach(trainee);
@@ -100,7 +100,7 @@ public class TraineeDAO implements Validation {
 
         if(trainee == null){
             log.warn("User with given user_id is not found!");
-            throw new ExceptionHandlerController.UserNotFoundException("User with given user_id is not found!");
+            throw new UserNotFoundException("User with given user_id is not found!");
         }
 
         if (!trainee.getPassword().equals(oldPassword)) {
@@ -139,7 +139,7 @@ public class TraineeDAO implements Validation {
 
         if(trainee == null) {
             log.warn("User with given user_id is not found!");
-            throw new ExceptionHandlerController.UserNotFoundException("User with given user_id is not found!");
+            throw new UserNotFoundException("User with given user_id is not found!");
         }
 
         entityManager.detach(trainee);

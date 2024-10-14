@@ -2,6 +2,7 @@ package com.urilvv.GymApplicationEpam.controllers;
 
 import com.urilvv.GymApplicationEpam.dtos.TrainerDTO;
 import com.urilvv.GymApplicationEpam.dtos.TrainingDTO;
+import com.urilvv.GymApplicationEpam.exceptions.UserNotFoundException;
 import com.urilvv.GymApplicationEpam.models.Trainer;
 import com.urilvv.GymApplicationEpam.requestResponseModels.login.LoginChangeRequest;
 import com.urilvv.GymApplicationEpam.requestResponseModels.register.RegisterResponse;
@@ -82,7 +83,7 @@ public class TrainerController {
     )
     @GetMapping("/profile/{username}")
     public ResponseEntity<TrainerDTO> getTrainerProfile(@PathVariable String username) {
-        Trainer trainer = trainerService.selectTrainer(username).orElseThrow(ExceptionHandlerController.UserNotFoundException::new);
+        Trainer trainer = trainerService.selectTrainer(username).orElseThrow(UserNotFoundException::new);
         return new ResponseEntity<>(mapper.mapTrainer(trainer), HttpStatus.OK);
     }
 

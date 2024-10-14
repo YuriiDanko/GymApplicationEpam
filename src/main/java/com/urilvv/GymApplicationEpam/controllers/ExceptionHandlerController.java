@@ -1,5 +1,6 @@
 package com.urilvv.GymApplicationEpam.controllers;
 
+import com.urilvv.GymApplicationEpam.exceptions.UserNotFoundException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -39,17 +40,6 @@ public class ExceptionHandlerController extends ResponseEntityExceptionHandler {
     @ExceptionHandler(UserNotFoundException.class)
     protected ResponseEntity<Object> handleUserNotFound(UserNotFoundException ex) {
         return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
-    }
-
-     public static class UserNotFoundException extends RuntimeException {
-
-        public UserNotFoundException() {
-        }
-
-        public UserNotFoundException(String message) {
-            super(message);
-        }
-
     }
 
 }
