@@ -1,15 +1,15 @@
 package com.urilvv.GymApplicationEpam.daos;
 
 import com.urilvv.GymApplicationEpam.enums.TrainingType;
+import com.urilvv.GymApplicationEpam.exceptions.TrainingIsNotExist;
 import com.urilvv.GymApplicationEpam.models.Trainee;
 import com.urilvv.GymApplicationEpam.models.Trainer;
 import com.urilvv.GymApplicationEpam.models.Training;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import org.springframework.transaction.annotation.Transactional;
+import com.urilvv.GymApplicationEpam.repositories.TrainingRepository;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -21,8 +21,7 @@ import java.util.Optional;
 @Data
 public class TrainingDAO {
 
-    @PersistenceContext
-    private EntityManager entityManager;
+    private final TrainingRepository trainingRepository;
 
     @Transactional
     public Training createTraining(Trainee trainee, Trainer trainer, String trainingName,
@@ -33,7 +32,7 @@ public class TrainingDAO {
         trainee.addTraining(training);
         trainer.addTraining(training);
 
-        entityManager.persist(training);
+        trainingRepository.save(training);
 
         log.info("Training session with training_id - " + training.getTrainingId() + " was created.");
 
@@ -41,31 +40,34 @@ public class TrainingDAO {
     }
 
     public Optional<Training> selectTraining(String trainingId) {
-        List<Training> resultList = entityManager.createQuery("select tr from Training tr where tr.trainingId = :trainingId"
-                        , Training.class).setParameter("trainingId", trainingId).getResultList();
+        Optional<Training> trainingOpt = trainingRepository.findById(trainingId);
 
-        if (resultList.isEmpty()) {
+        if (trainingOpt.isEmpty()) {
             log.warn("No Training exists with given training_id - " + trainingId);
             return Optional.empty();
         }
 
-        log.info("Training with training_id - " + resultList.get(0).getTrainingId() + " was returned.");
-        return Optional.ofNullable(resultList.get(0));
+        log.info("Training with training_id - " + trainingOpt.get().getTrainingId() + " was returned.");
+        return trainingOpt;
     }
 
     @Transactional
     public boolean deleteTraining(String trainingId) {
-        int updatedEntities = entityManager.createQuery("delete from Training tr where tr.trainingId = :trainingId")
-                .setParameter("trainingId", trainingId)
-                .executeUpdate();
+        Optional<Training> trainingOpt = trainingRepository.findById(trainingId);
 
-        return updatedEntities == 1;
+        if (trainingOpt.isEmpty()) {
+            log.warn("No Training exists with given training_id - " + trainingId);
+            throw new TrainingIsNotExist();
+        }
+
+        trainingRepository.delete(trainingOpt.get());
+
+        return true;
     }
 
     public List<Training> getAllTrainings() {
         log.info("List of Trainings was returned.");
-        return entityManager.createQuery("from Training", Training.class)
-                .getResultList();
+        return trainingRepository.findAll();
     }
 
 }
