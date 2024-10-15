@@ -1,6 +1,5 @@
-package com.urilvv.GymApplicationEpam.controllers;
+package com.urilvv.GymApplicationEpam.exceptions;
 
-import com.urilvv.GymApplicationEpam.exceptions.UserNotFoundException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -32,14 +31,14 @@ public class ExceptionHandlerController extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler({IllegalArgumentException.class, NullPointerException.class})
+    @ExceptionHandler({NullPointerException.class})
     protected ResponseEntity<Object> handleRuntimeException(RuntimeException ex) {
         return new ResponseEntity<>("Illegal arguments in RequestCall - " + ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler(UserNotFoundException.class)
-    protected ResponseEntity<Object> handleUserNotFound(UserNotFoundException ex) {
-        return new ResponseEntity<>(ex.getMessage(), HttpStatus.NOT_FOUND);
+    @ExceptionHandler(CustomBaseException.class)
+    protected ResponseEntity<Object> handleUserNotFound(CustomBaseException ex) {
+        return new ResponseEntity<>(ex.getResponse(), ex.getStatusCode());
     }
 
 }

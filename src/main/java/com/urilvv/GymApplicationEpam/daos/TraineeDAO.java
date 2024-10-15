@@ -1,6 +1,7 @@
 package com.urilvv.GymApplicationEpam.daos;
 
 import com.urilvv.GymApplicationEpam.enums.TrainingType;
+import com.urilvv.GymApplicationEpam.exceptions.PasswordMatchersException;
 import com.urilvv.GymApplicationEpam.exceptions.UserNotFoundException;
 import com.urilvv.GymApplicationEpam.models.Trainee;
 import com.urilvv.GymApplicationEpam.models.Training;
@@ -65,7 +66,7 @@ public class TraineeDAO implements Validation {
         }
 
         log.warn("Trainee with user_id - " + userId + " was not deleted. No record found.");
-        throw new UserNotFoundException("User with given user_id is not found!");
+        throw new UserNotFoundException();
     }
 
     @Transactional
@@ -75,7 +76,7 @@ public class TraineeDAO implements Validation {
 
         if(trainee == null) {
             log.warn("User with given user_id is not found!");
-            throw new UserNotFoundException("User with given user_id is not found!");
+            throw new UserNotFoundException();
         }
 
         entityManager.detach(trainee);
@@ -100,15 +101,15 @@ public class TraineeDAO implements Validation {
 
         if(trainee == null){
             log.warn("User with given user_id is not found!");
-            throw new UserNotFoundException("User with given user_id is not found!");
+            throw new UserNotFoundException();
         }
 
         if (!trainee.getPassword().equals(oldPassword)) {
             log.error("Password is not correct. Try again.");
-            throw new IllegalArgumentException("Password is not correct. Try again.");
+            throw new PasswordMatchersException("Password is not correct. Try again.");
         } else if (newPassword.equals(oldPassword)) {
             log.error("Enter new password instead of old one.");
-            throw new IllegalArgumentException("Enter new password instead of old one.");
+            throw new PasswordMatchersException("Enter new password instead of old one.");
         }
 
         RuleResult passwordValidation = passwordValidator.validate(new PasswordData(newPassword));
@@ -130,7 +131,7 @@ public class TraineeDAO implements Validation {
                 \tShould not contain any whitespaces.
                 """);
 
-        throw new IllegalArgumentException("Password was not validated.");
+        throw new PasswordMatchersException("Password was not validated.");
     }
 
     @Transactional
@@ -139,7 +140,7 @@ public class TraineeDAO implements Validation {
 
         if(trainee == null) {
             log.warn("User with given user_id is not found!");
-            throw new UserNotFoundException("User with given user_id is not found!");
+            throw new UserNotFoundException();
         }
 
         entityManager.detach(trainee);

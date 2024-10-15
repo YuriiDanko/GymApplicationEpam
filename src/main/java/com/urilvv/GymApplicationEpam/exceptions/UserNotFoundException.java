@@ -1,12 +1,11 @@
 package com.urilvv.GymApplicationEpam.exceptions;
 
-public class UserNotFoundException extends RuntimeException {
+import org.springframework.http.HttpStatus;
+
+public class UserNotFoundException extends CustomBaseException {
 
     public UserNotFoundException() {
-    }
-
-    public UserNotFoundException(String message) {
-        super(message);
+        super(HttpStatus.NOT_FOUND, new SimpleResponse("User was not found."));
     }
 
 }

@@ -16,7 +16,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class TraineeServiceTests {
@@ -79,6 +79,7 @@ public class TraineeServiceTests {
         boolean deleted = traineeService.deleteTrainee("user_id");
 
         assertTrue(deleted);
+        verify(traineeDAO, times(1)).deleteTrainee(any(String.class));
     }
 
 
