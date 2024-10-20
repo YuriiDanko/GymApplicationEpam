@@ -1,7 +1,7 @@
 package com.urilvv.GymApplicationEpam.daos;
 
 import com.urilvv.GymApplicationEpam.enums.TrainingType;
-import com.urilvv.GymApplicationEpam.exceptions.TrainingIsNotExist;
+import com.urilvv.GymApplicationEpam.exceptions.TrainingDoesNotExist;
 import com.urilvv.GymApplicationEpam.models.Trainee;
 import com.urilvv.GymApplicationEpam.models.Trainer;
 import com.urilvv.GymApplicationEpam.models.Training;
@@ -57,7 +57,7 @@ public class TrainingDAO {
 
         if (trainingOpt.isEmpty()) {
             log.warn("No Training exists with given training_id - " + trainingId);
-            throw new TrainingIsNotExist();
+            throw new TrainingDoesNotExist();
         }
 
         trainingRepository.delete(trainingOpt.get());

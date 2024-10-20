@@ -3,6 +3,7 @@ package com.urilvv.GymApplicationEpam.controllers;
 import com.urilvv.GymApplicationEpam.dtos.TraineeDTO;
 import com.urilvv.GymApplicationEpam.dtos.TrainingDTO;
 import com.urilvv.GymApplicationEpam.enums.TrainingType;
+import com.urilvv.GymApplicationEpam.exceptions.SimpleResponse;
 import com.urilvv.GymApplicationEpam.exceptions.UserNotFoundException;
 import com.urilvv.GymApplicationEpam.models.Trainee;
 import com.urilvv.GymApplicationEpam.requestResponseModels.login.LoginChangeRequest;
@@ -104,7 +105,12 @@ public class TraineeController {
     @DeleteMapping("/delete/{user_id}")
     public ResponseEntity<Object> deleteTrainee(@PathVariable("user_id") String userId) {
         boolean isDeleted = traineeService.deleteTrainee(userId);
-        return new ResponseEntity<>(isDeleted, HttpStatus.OK);
+
+        if(!isDeleted) {
+            throw new UserNotFoundException();
+        }
+
+        return new ResponseEntity<>(new SimpleResponse("User was deleted successfully."), HttpStatus.OK);
     }
 
     @Operation(
