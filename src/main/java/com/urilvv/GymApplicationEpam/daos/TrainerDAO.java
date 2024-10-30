@@ -1,16 +1,14 @@
 package com.urilvv.GymApplicationEpam.daos;
 
 import com.urilvv.GymApplicationEpam.enums.Specialization;
+import com.urilvv.GymApplicationEpam.exceptions.PasswordMatchersException;
 import com.urilvv.GymApplicationEpam.exceptions.UserNotFoundException;
 import com.urilvv.GymApplicationEpam.models.Trainer;
 import com.urilvv.GymApplicationEpam.models.Training;
 import com.urilvv.GymApplicationEpam.models.User;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
+import com.urilvv.GymApplicationEpam.repositories.TrainerRepository;
+import com.urilvv.GymApplicationEpam.repositories.TrainingRepository;
+import com.urilvv.GymApplicationEpam.utils.TrainingSpecifications;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.passay.PasswordData;
@@ -23,17 +21,21 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import static org.springframework.data.jpa.domain.Specification.where;
+
 @Component
 @Slf4j
 @Data
 public class TrainerDAO implements Validation {
 
-    @PersistenceContext
-    private EntityManager entityManager;
     private final PasswordValidator passwordValidator;
+    private final TrainerRepository trainerRepository;
+    private final TrainingRepository trainingRepository;
 
-    public TrainerDAO(PasswordValidator passwordValidator) {
+    public TrainerDAO(PasswordValidator passwordValidator, TrainerRepository trainerRepository, TrainingRepository trainingRepository) {
         this.passwordValidator = passwordValidator;
+        this.trainerRepository = trainerRepository;
+        this.trainingRepository = trainingRepository;
     }
 
     @Transactional
@@ -49,7 +51,7 @@ public class TrainerDAO implements Validation {
             trainer.setUsername(User.generateUsername(trainer.getFirstName() + "." + trainer.getLastName()));
         }
 
-        entityManager.persist(trainer);
+        trainerRepository.save(trainer);
 
         log.info("Trainer with user_id - " + trainer.getUserId() + " was created.");
 
@@ -59,14 +61,15 @@ public class TrainerDAO implements Validation {
     @Transactional
     public Trainer editTrainer(String userId, String firstName, String lastName,
                                String spec) {
-        Trainer trainer = entityManager.find(Trainer.class, userId);
+        Optional<Trainer> trainerOpt = trainerRepository.findById(userId);
 
-        if(trainer == null) {
+        if(trainerOpt.isEmpty()) {
             log.warn("User with given user_id is not found!");
-            throw new UserNotFoundException("User with given user_id is not found!");
+            throw new UserNotFoundException();
         }
 
-        entityManager.detach(trainer);
+        Trainer trainer = trainerOpt.get();
+
         trainer.setFirstName(firstName);
         trainer.setLastName(lastName);
         trainer.setUsername(firstName + "." + lastName);
@@ -78,57 +81,54 @@ public class TrainerDAO implements Validation {
 
         log.info("Trainer with user_id - " + trainer.getUserId() + " was edited.");
 
-        entityManager.merge(trainer);
+        trainerRepository.save(trainer);
 
         return trainer;
     }
 
     public Optional<Trainer> selectTrainer(String username) {
-        List<Trainer> resultList = entityManager.createQuery("select t from Trainer t left join fetch t.trainerTrainings " +
-                        "where t.username = :username", Trainer.class)
-                .setParameter("username", username)
-                .getResultList();
+        Optional<Trainer> trainerOpt = trainerRepository.findByUsername(username);
 
-        if (resultList.isEmpty()) {
+        if (trainerOpt.isEmpty()) {
             log.warn("No Trainer found with given username - " + username);
             return Optional.empty();
         }
 
-        log.info("Trainer profile with user_id - " + resultList.get(0).getUserId() + " was returned.");
-        return Optional.ofNullable(resultList.get(0));
+        log.info("Trainer profile with user_id - " + trainerOpt.get().getUserId() + " was returned.");
+        return trainerOpt;
     }
 
     public List<Trainer> getAllTrainers() {
         log.info("List of Trainers was returned.");
-        return entityManager.createQuery("select t from Trainer t left outer join Training tr on t.userId = tr.trainee.userId", Trainer.class)
-                .getResultList();
+        return trainerRepository.findAll();
     }
 
     @Transactional
     public void changePassword(String userId, String oldPassword, String newPassword) {
-        Trainer trainer = entityManager.find(Trainer.class, userId);
+        Optional<Trainer> trainerOpt = trainerRepository.findById(userId);
 
-        if(trainer == null) {
+        if(trainerOpt.isEmpty()) {
             log.warn("User with given user_id is not found!");
-            throw new UserNotFoundException("User with given user_id is not found!");
+            throw new UserNotFoundException();
         }
+
+        Trainer trainer = trainerOpt.get();
 
         if(!trainer.getPassword().equals(oldPassword)) {
             log.error("Password is not correct. Try again.");
-            throw new IllegalArgumentException("Password is not correct. Try again.");
+            throw new PasswordMatchersException("Password is not correct. Try again.");
         }
         else if(newPassword.equals(oldPassword)) {
             log.error("Enter new password instead of old one.");
-            throw new IllegalArgumentException("Enter new password instead of old one.");
+            throw new PasswordMatchersException("Enter new password instead of old one.");
         }
 
         RuleResult passwordValidation = passwordValidator.validate(new PasswordData(newPassword));
 
         if(passwordValidation.isValid()) {
             log.info("Password for Trainer with user_id - " + userId + " was changed.");
-            entityManager.detach(trainer);
             trainer.setPassword(newPassword);
-            entityManager.merge(trainer);
+            trainerRepository.save(trainer);
             return;
         }
 
@@ -141,40 +141,32 @@ public class TrainerDAO implements Validation {
                 \tShould not contain any whitespaces.
                 """);
 
-        throw new IllegalArgumentException("Password was not validated.");
+        throw new PasswordMatchersException("Password was not validated.");
     }
 
     @Transactional
     public void changeActiveStatus(String userId) {
-        Trainer trainer = entityManager.find(Trainer.class, userId);
+        Optional<Trainer> trainerOpt = trainerRepository.findById(userId);
 
-        if(trainer == null) {
+        if(trainerOpt.isEmpty()) {
             log.warn("User with given user_id is not found!");
-            throw new UserNotFoundException("User with given user_id is not found!");
+            throw new UserNotFoundException();
         }
 
-        entityManager.detach(trainer);
+        Trainer trainer = trainerOpt.get();
+
         trainer.setActive(!trainer.isActive());
-        entityManager.merge(trainer);
+        trainerRepository.save(trainer);
+
         log.info("Active Status for Trainer with user_id - " + userId + " was changed to " + trainer.isActive() + ".");
     }
 
     public List<Training> getTrainerTrainingList(String trainerUsername, LocalDate from, LocalDate to, String traineeUsername) {
-        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
-        CriteriaQuery<Training> criteriaQuery = criteriaBuilder.createQuery(Training.class);
-
-        Root<Training> trainingRoot = criteriaQuery.from(Training.class);
-
-        Predicate trainerUsernamePredicate = criteriaBuilder.like(trainingRoot.get("trainer").get("username"), trainerUsername);
-        Predicate fromToDatePredicate = criteriaBuilder.between(trainingRoot.get("trainingTime"), from, to);
-        Predicate traineeUsernamePredicate = criteriaBuilder.like(trainingRoot.get("trainee").get("username"), traineeUsername);
-
-        criteriaQuery.select(trainingRoot).where(criteriaBuilder.and(traineeUsernamePredicate, trainerUsernamePredicate,
-                fromToDatePredicate));
-
-        log.info("Trainer related trainings were returned.");
-
-        return entityManager.createQuery(criteriaQuery).getResultList();
+        return trainingRepository.findAll(
+                where(TrainingSpecifications.hasTrainerUsername(trainerUsername))
+                        .and(TrainingSpecifications.betweenTrainingTime(from, to))
+                        .and(TrainingSpecifications.hasTraineeUsername(traineeUsername))
+        );
     }
 
     @Override
