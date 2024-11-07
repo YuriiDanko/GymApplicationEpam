@@ -31,7 +31,7 @@ public class ExceptionHandlerController extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
 
-    @ExceptionHandler({NullPointerException.class})
+    @ExceptionHandler(NullPointerException.class)
     protected ResponseEntity<Object> handleRuntimeException(RuntimeException ex) {
         return new ResponseEntity<>("Illegal arguments in RequestCall - " + ex.getMessage(), HttpStatus.BAD_REQUEST);
     }
