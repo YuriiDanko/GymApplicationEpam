@@ -1,9 +1,13 @@
 package com.urilvv.GymApplicationEpam.configurations;
 
+import com.urilvv.GymApplicationEpam.services.servicesImpl.CustomUserDetailsService;
+import lombok.AllArgsConstructor;
 import org.passay.*;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -17,19 +21,22 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @EnableWebMvc
 @EnableWebSecurity
 @ComponentScan("com.urilvv.*")
+@AllArgsConstructor
 public class BaseConfiguration {
+
+    private final CustomUserDetailsService userDetailsService;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
         http
                 .csrf(AbstractHttpConfigurer::disable)
+                .cors(Customizer.withDefaults())
                 .authorizeHttpRequests(authz -> authz
                         .requestMatchers("/trainees/register").permitAll()
                         .requestMatchers("/trainers/register").permitAll()
                         .anyRequest().authenticated()
                 )
-                .formLogin(Customizer.withDefaults())
-                .logout(Customizer.withDefaults());
+                .httpBasic(Customizer.withDefaults());
 
         return http.build();
     }
@@ -48,6 +55,14 @@ public class BaseConfiguration {
     @Bean
     public PasswordEncoder getPasswordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public AuthenticationProvider getAuthenticationProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(userDetailsService);
+        authProvider.setPasswordEncoder(getPasswordEncoder());
+        return authProvider;
     }
 
 }
