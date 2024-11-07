@@ -1,12 +1,10 @@
 package com.urilvv.GymApplicationEpam.services.servicesImpl;
 
-import com.urilvv.GymApplicationEpam.exceptions.LoginBlockedException;
 import com.urilvv.GymApplicationEpam.models.Trainee;
 import com.urilvv.GymApplicationEpam.models.Trainer;
 import com.urilvv.GymApplicationEpam.repositories.TraineeRepository;
 import com.urilvv.GymApplicationEpam.repositories.TrainerRepository;
 import com.urilvv.GymApplicationEpam.security.LoginAttemptService;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -27,7 +25,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         if (loginAttemptService.isBlocked()) {
-            throw new LoginBlockedException();
+            throw new RuntimeException("You made a lot of tries to authenticate. Try again later!");
         }
 
         Optional<Trainee> traineeOpt = traineeRepository.findByUsername(username);
