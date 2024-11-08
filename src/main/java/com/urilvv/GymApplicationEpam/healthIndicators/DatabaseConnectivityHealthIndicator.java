@@ -1,7 +1,6 @@
 package com.urilvv.GymApplicationEpam.healthIndicators;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.boot.actuate.health.HealthIndicator;
 import org.springframework.stereotype.Component;

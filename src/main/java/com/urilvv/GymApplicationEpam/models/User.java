@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import org.passay.CharacterRule;
 import org.passay.EnglishCharacterData;
 import org.passay.PasswordGenerator;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.Arrays;
 import java.util.List;
@@ -48,7 +49,13 @@ public abstract class User {
 
         PasswordGenerator passwordGenerator = new PasswordGenerator();
 
-        return passwordGenerator.generatePassword(15, rules);
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+
+        String generatedPassword = passwordGenerator.generatePassword(15, rules);
+
+        System.out.println("True password form - " + generatedPassword);
+
+        return encoder.encode(generatedPassword);
     }
 
     public static String generateUsername(String base) {
